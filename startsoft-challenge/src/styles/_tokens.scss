@@ -1,0 +1,16 @@
+:root {
+  /* Colors */
+  --color-primary: #ff8310;
+  --color-bg: #232323;
+  --color-surface: #191a20;
+  --color-surface-2: #393939;
+  --color-muted: #cccccc;
+  --color-white: #ffffff;
+
+  /* Radius */
+  --radius-md: 8px;
+
+  /* Typography */
+  --font-sans:
+    var(--font-poppins), system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
