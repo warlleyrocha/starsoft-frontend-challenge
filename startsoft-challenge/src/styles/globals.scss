@@ -32,6 +32,13 @@ body {
   color: var(--color-white);
 }
 
+.container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 184px auto;
+  padding: 0 24px;
+}
+
 // Remove estilos padrão de listas
 ul,
 ol {
