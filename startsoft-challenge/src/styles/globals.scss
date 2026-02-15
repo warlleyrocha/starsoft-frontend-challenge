@@ -1,0 +1,81 @@
+@use "./tokens";
+
+// CSS Reset
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+// Base do projeto
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  background-color: var(--color-bg);
+  color: var(--color-white);
+}
+
+.container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 184px auto;
+  padding: 0 24px;
+}
+
+// Remove estilos padrão de listas
+ul,
+ol {
+  list-style: none;
+}
+
+// Remove estilo padrão de links
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+// Mídia responsiva
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+// Inputs herdam fonte
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+// Evita overflow de texto
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}

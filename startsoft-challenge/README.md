@@ -1,40 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Starsoft Frontend Challenge
 
-## Getting Started
+Implementação da interface de um Marketplace de NFTs utilizando **Next.js**, seguindo o design fornecido no Figma e os requisitos do desafio técnico.
 
-First, run the development server:
+---
+
+## 🚀 Tecnologias Utilizadas
+
+- Next.js (Pages Router)
+- TypeScript
+- SASS (SCSS Modules)
+- Redux Toolkit (estrutura preparada)
+- React Query (dependência instalada, integração com API pendente)
+- Framer Motion (animação do carrinho)
+- ESLint + Prettier
+- Docker + Docker Compose
+
+---
+
+## 📦 Status Atual do Projeto
+
+O projeto atualmente inclui:
+
+- Lista de NFTs e componente de Card (utilizando mock de dados)
+- Grid responsivo (desktop, tablet e mobile)
+- Drawer de carrinho com animação lateral
+- Tokens globais de design (cores, espaçamentos e tipografia)
+- Componente Button reutilizável
+- Configuração completa de ambiente com Docker
+
+> A integração com a API oficial e o gerenciamento global de estado do carrinho com Redux serão implementados na próxima etapa.
+
+---
+
+## 🖥 Como Rodar Localmente
+
+### 1. Instalar dependências
+
+```bash
+npm install
+```
+
+### 2. Iniciar servidor de desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação estará disponível em:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+---
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## 🐳 Como Rodar com Docker
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Buildar e iniciar o container
 
-## Learn More
+```bash
+docker-compose up --build
+```
 
-To learn more about Next.js, take a look at the following resources:
+A aplicação estará disponível em:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```
+http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para encerrar:
 
-## Deploy on Vercel
+```bash
+docker-compose down
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## 🧹 Lint e Formatação
+
+Executar ESLint:
+
+```bash
+npm run lint
+```
+
+Executar Prettier:
+
+```bash
+npm run format
+```
+
+---
+
+## 📁 Estrutura do Projeto (Arquitetura Feature-Based)
+
+```
+src/
+ ├─ features/
+ │   ├─ nfts/
+ │   └─ cart/
+ ├─ shared/
+ │   └─ components/
+ ├─ styles/
+ └─ pages/
+```
+
+Essa abordagem facilita escalabilidade, organização por domínio e manutenção do projeto.
+
+---
+
+## 🎨 Fidelidade ao Design
+
+A interface foi implementada buscando máxima fidelidade ao Figma:
+
+- Espaçamentos alinhados
+- Breakpoints responsivos definidos manualmente
+- Tokens de design centralizados
+- Componentização reutilizável
+
+---
+
+## 🧠 Decisões Arquiteturais
+
+- Utilização de **SASS Modules** para escopo isolado de estilos
+- Arquitetura orientada a features
+- Framer Motion para animações suaves do drawer
+- Configuração Docker para ambiente reprodutível
+
+---
+
+## 📌 Próximos Passos
+
+- Integração com a API oficial do desafio
+- Implementação do estado global do carrinho com Redux
+- Testes unitários e de integração (Jest + React Testing Library)
+- Estratégia de SSR/SSG para otimização de performance
+
+---
+
+## 📄 Convenção de Commits
+
+Este projeto segue o padrão Conventional Commits:
+
+```
+feat(scope): descrição
+refactor(scope): descrição
+style(scope): descrição
+chore(scope): descrição
+```
+
+---
+
+## 👨‍💻 Autor
+
+Warlley Rocha

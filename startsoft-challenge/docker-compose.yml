@@ -1,0 +1,14 @@
+services:
+  web:
+    container_name: startsoft-challenge-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    environment:
+      - NODE_ENV=development
+      # Em alguns ambientes o HMR precisa disso:
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
