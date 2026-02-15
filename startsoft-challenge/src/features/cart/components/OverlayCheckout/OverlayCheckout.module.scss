@@ -8,10 +8,14 @@
 }
 
 .drawer {
-  width: 679px;
-  height: 100%;
+  width: min(679px, 100vw);
+  height: 100dvh;
   background: var(--color-bg);
   border-left: 1px solid rgba(255, 255, 255, 0.06);
+
+  display: flex;
+  flex-direction: column;
+
   padding: 18px 16px;
 }
 
@@ -19,8 +23,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 5vh;
-  margin-bottom: 16vh;
+  margin-top: 24px;
+  margin-bottom: 24px;
   padding-left: 24px;
   padding-right: 24px;
 }
@@ -57,6 +61,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .itemCard {
@@ -187,4 +196,102 @@
   font-weight: 600;
   font-size: 24px;
   color: rgba(240, 240, 240, 1);
+}
+
+// Tablet
+@media (max-width: 900px) {
+  .drawer {
+    width: min(520px, 100vw);
+  }
+
+  .itemCard {
+    gap: 20px;
+    padding: 16px 18px;
+  }
+
+  .thumb {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+// Mobile
+@media (max-width: 600px) {
+  .overlay {
+    justify-content: stretch;
+  }
+
+  .drawer {
+    width: 100vw;
+    padding: 16px 14px;
+    border-left: none;
+  }
+
+  .header {
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .backButton {
+    width: 48px;
+    height: 48px;
+  }
+
+  .content {
+    padding: 0 8px 16px;
+    gap: 12px;
+  }
+
+  .itemCard {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+    position: relative;
+  }
+
+  .thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .itemInfo {
+    width: 100%;
+  }
+
+  .priceRow {
+    font-size: 18px;
+
+    span {
+      font-size: 18px;
+    }
+  }
+
+  .qty {
+    width: 100%;
+    max-width: 160px;
+  }
+
+  .trash {
+    position: absolute;
+    top: 450px;
+    right: 20px;
+    margin-left: 0;
+    align-self: auto;
+  }
+
+  .totalRow {
+    padding: 24px 0;
+  }
+
+  .totalLabel,
+  .totalValue {
+    font-size: 18px;
+  }
 }
