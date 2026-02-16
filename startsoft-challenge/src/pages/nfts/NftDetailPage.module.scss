@@ -1,0 +1,83 @@
+.wrapper {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--color-muted);
+  font-size: 14px;
+  transition: color 120ms ease;
+
+  &:hover {
+    color: var(--color-white);
+  }
+}
+
+.card {
+  display: grid;
+  grid-template-columns: minmax(260px, 460px) 1fr;
+  gap: 32px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.imageWrapper {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: #22232c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.value {
+  font-size: 16px;
+}
+
+.priceRow {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+}
+
+@media (max-width: 860px) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}
