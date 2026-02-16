@@ -1,4 +1,5 @@
 import { apiRequest } from "@/shared/lib/http/apiClient";
+import { NFT_QUERY_DEFAULTS } from "../config/queryDefaults";
 import type { Nft } from "../types/nft.types";
 import type { GetNftsParams } from "../types/nft-query.types";
 
@@ -46,9 +47,9 @@ function normalizeNftList(payload: RawNftResponse): Nft[] {
 // O endpoint exige parâmetros de paginação/ordenação e retorna lista + total.
 export async function getNfts({
   page = 1,
-  rows = 8,
-  sortBy = "name",
-  orderBy = "ASC",
+  rows = NFT_QUERY_DEFAULTS.rowsPerPage,
+  sortBy = NFT_QUERY_DEFAULTS.sortBy,
+  orderBy = NFT_QUERY_DEFAULTS.orderBy,
 }: GetNftsParams = {}): Promise<GetNftsResult> {
   const query = new URLSearchParams({
     page: String(page),

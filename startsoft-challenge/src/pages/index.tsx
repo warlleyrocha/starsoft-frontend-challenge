@@ -8,13 +8,10 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { OverlayCheckout } from "@/features/cart/components/OverlayCheckout";
 import { LoadMore } from "@/features/nfts/components/LoadMore";
 import { List } from "@/features/nfts/components/List";
+import { NFT_QUERY_DEFAULTS } from "@/features/nfts/config/queryDefaults";
 import { getNfts, type GetNftsResult } from "@/features/nfts/api/nftApi";
 import { useNftsQuery } from "@/features/nfts/hooks/useNftsQuery";
 import type { Nft } from "@/features/nfts/types/nft.types";
-
-const ROWS_PER_PAGE = 8;
-const SORT_BY = "name";
-const ORDER_BY = "ASC" as const;
 
 type HomeProps = {
   readonly initialNfts: GetNftsResult | null;
@@ -35,9 +32,9 @@ export default function Home({ initialNfts }: HomeProps) {
   const { data, isLoading, isFetching, isError, error } = useNftsQuery(
     {
       page,
-      rows: ROWS_PER_PAGE,
-      sortBy: SORT_BY,
-      orderBy: ORDER_BY,
+      rows: NFT_QUERY_DEFAULTS.rowsPerPage,
+      sortBy: NFT_QUERY_DEFAULTS.sortBy,
+      orderBy: NFT_QUERY_DEFAULTS.orderBy,
     },
     {
       initialData: page === 1 ? initialNfts ?? undefined : undefined,
@@ -105,9 +102,9 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
     const initialNfts = await getNfts({
       page: 1,
-      rows: ROWS_PER_PAGE,
-      sortBy: SORT_BY,
-      orderBy: ORDER_BY,
+      rows: NFT_QUERY_DEFAULTS.rowsPerPage,
+      sortBy: NFT_QUERY_DEFAULTS.sortBy,
+      orderBy: NFT_QUERY_DEFAULTS.orderBy,
     });
 
     return {
