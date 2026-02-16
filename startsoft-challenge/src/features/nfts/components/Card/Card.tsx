@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Nft } from "../../types/nft.types";
 import styles from "./Card.module.scss";
 import { Button } from "@/shared/components/Button";
@@ -24,6 +25,11 @@ export function Card({ nft }: Props) {
             <span>{nft.price} ETH</span>
           </div>
         </div>
+
+        <Link href={`/nfts/${nft.id}`} className={styles.detailsLink}>
+          Ver detalhes
+        </Link>
+
         <Button size="md" className={styles.buyButton}>
           Comprar
         </Button>

@@ -40,7 +40,13 @@ O projeto atualmente inclui:
 npm install
 ```
 
-### 2. Iniciar servidor de desenvolvimento
+### 2. Configurar variáveis de ambiente
+
+```bash
+cp .env.example .env.local
+```
+
+### 3. Iniciar servidor de desenvolvimento
 
 ```bash
 npm run dev
