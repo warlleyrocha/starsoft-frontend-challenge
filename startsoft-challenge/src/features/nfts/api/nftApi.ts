@@ -69,3 +69,30 @@ export async function getNfts({
     count: response.count,
   };
 }
+
+// Fallback para detalhe quando a API não expõe GET /products/:id.
+// Percorre páginas da coleção até encontrar o item pelo id.
+export async function getNftById(id: string): Promise<Nft | null> {
+  const targetId = id.trim();
+  if (!targetId) return null;
+
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages) {
+    const result = await getNfts({
+      page,
+      rows: NFT_QUERY_DEFAULTS.rowsPerPage,
+      sortBy: NFT_QUERY_DEFAULTS.sortBy,
+      orderBy: NFT_QUERY_DEFAULTS.orderBy,
+    });
+
+    const found = result.items.find((item) => item.id === targetId);
+    if (found) return found;
+
+    totalPages = Math.max(1, Math.ceil(result.count / NFT_QUERY_DEFAULTS.rowsPerPage));
+    page += 1;
+  }
+
+  return null;
+}
