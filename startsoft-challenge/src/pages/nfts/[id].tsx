@@ -5,7 +5,9 @@ import type { GetServerSideProps } from "next";
 import { Header } from "@/shared/components/Header";
 import { Footer } from "@/shared/components/Footer";
 import { getNftById } from "@/features/nfts/api/nftApi";
+import { selectCartCount } from "@/features/cart/store/cartSelectors";
 import type { Nft } from "@/features/nfts/types/nft.types";
+import { useAppSelector } from "@/shared/store/hooks";
 
 import styles from "./NftDetailPage.module.scss";
 
@@ -14,9 +16,11 @@ type NftDetailPageProps = {
 };
 
 export default function NftDetailPage({ nft }: NftDetailPageProps) {
+  const cartCount = useAppSelector(selectCartCount);
+
   return (
     <>
-      <Header cartCount={2} />
+      <Header cartCount={cartCount} />
 
       <main className="container">
         <section className={styles.wrapper}>

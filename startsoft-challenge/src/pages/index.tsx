@@ -4,8 +4,10 @@ import type { GetServerSideProps } from "next";
 import { Header } from "@/shared/components/Header";
 import { Footer } from "@/shared/components/Footer";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { useAppSelector } from "@/shared/store/hooks";
 
 import { OverlayCheckout } from "@/features/cart/components/OverlayCheckout";
+import { selectCartCount } from "@/features/cart/store/cartSelectors";
 import { LoadMore } from "@/features/nfts/components/LoadMore";
 import { List } from "@/features/nfts/components/List";
 import { NFT_QUERY_DEFAULTS } from "@/features/nfts/config/queryDefaults";
@@ -28,6 +30,7 @@ export default function Home({ initialNfts }: HomeProps) {
   const [page, setPage] = useState(1);
   const [visibleItems, setVisibleItems] = useState<Nft[]>(() => initialNfts?.items ?? []);
   const [totalCount, setTotalCount] = useState(() => initialNfts?.count ?? 0);
+  const cartCount = useAppSelector(selectCartCount);
 
   const { data, isLoading, isFetching, isError, error } = useNftsQuery(
     {
@@ -37,8 +40,8 @@ export default function Home({ initialNfts }: HomeProps) {
       orderBy: NFT_QUERY_DEFAULTS.orderBy,
     },
     {
-      initialData: page === 1 ? initialNfts ?? undefined : undefined,
-    }
+      initialData: page === 1 ? (initialNfts ?? undefined) : undefined,
+    },
   );
 
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function Home({ initialNfts }: HomeProps) {
 
   return (
     <>
-      <Header cartCount={2} onCartButtonClick={() => setIsCartOpen(true)} />
+      <Header cartCount={cartCount} onCartButtonClick={() => setIsCartOpen(true)} />
 
       <main className="container">
         {isInitialLoading && <p>Carregando NFTs...</p>}
