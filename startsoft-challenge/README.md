@@ -131,7 +131,7 @@ src/
 - `npm run start`: execução da build de produção
 - `npm run lint`: validação estática
 - `npm run format`: formatação com Prettier
-- `npm test`: suíte de testes
+- `npm run test`: suíte de testes
 
 ## 7. Limitações atuais
 
