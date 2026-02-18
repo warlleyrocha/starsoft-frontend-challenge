@@ -37,20 +37,22 @@ export function Card({ nft }: Props) {
         <h3 className={styles.title}>{nft.name}</h3>
         <p className={styles.description}>{nft.description}</p>
 
-        <div className={styles.footer}>
-          <div className={styles.price}>
-            <Image src="/assets/icons/ethereum.svg" alt="" width={29} height={29} aria-hidden />
-            <span>{nft.price} ETH</span>
+        <div className={styles.actions}>
+          <div className={styles.footer}>
+            <div className={styles.price}>
+              <Image src="/assets/icons/ethereum.svg" alt="" width={29} height={29} aria-hidden />
+              <span>{nft.price} ETH</span>
+            </div>
           </div>
+
+          <Link href={`/nfts/${nft.id}`} className={styles.detailsLink}>
+            Ver detalhes
+          </Link>
+
+          <Button size="md" className={styles.buyButton} onClick={handleAddToCart}>
+            {cartItem ? "Adicionado ao carrinho" : "Comprar"}
+          </Button>
         </div>
-
-        <Link href={`/nfts/${nft.id}`} className={styles.detailsLink}>
-          Ver detalhes
-        </Link>
-
-        <Button size="md" className={styles.buyButton} onClick={handleAddToCart}>
-          {cartItem ? "Adicionado ao carrinho" : "Comprar"}
-        </Button>
       </div>
     </article>
   );

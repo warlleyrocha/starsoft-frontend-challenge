@@ -44,6 +44,9 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 52px;
+
+  flex: 1;
+  width: 100%;
 }
 
 .title {
@@ -56,9 +59,26 @@
 .description {
   font-size: 12px;
   font-weight: 300;
-  line-height: 12px;
+  line-height: 16px;
   color: rgba(255, 255, 255, 0.6);
   padding-top: 6px;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+
+  /* padrão */
+  line-clamp: 4;
+
+  /* vendor prefix (ainda necessário para Chrome/Safari) */
+  -webkit-line-clamp: 4;
+}
+
+.actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .footer {
