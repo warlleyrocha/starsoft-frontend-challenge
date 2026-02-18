@@ -1,5 +1,6 @@
 import type { AnchorHTMLAttributes, ImgHTMLAttributes, ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { getNftById } from "@/features/nfts/api/nftApi";
 import { useAppSelector } from "@/shared/store/hooks";
 import NftDetailPage, { getServerSideProps } from "@/pages/nfts/[id]";
@@ -26,6 +27,10 @@ jest.mock("next/link", () => ({
   ),
 }));
 
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(),
+}));
+
 jest.mock("@/shared/store/hooks", () => ({
   useAppSelector: jest.fn(),
 }));
@@ -46,6 +51,7 @@ jest.mock("@/shared/components/Footer", () => ({
 
 const mockUseAppSelector = useAppSelector as jest.Mock;
 const mockGetNftById = getNftById as jest.MockedFunction<typeof getNftById>;
+const mockUseQueryClient = useQueryClient as jest.MockedFunction<typeof useQueryClient>;
 
 function createNft(overrides: Partial<Nft> = {}): Nft {
   return {
@@ -62,6 +68,9 @@ describe("NftDetailPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAppSelector.mockReturnValue(0);
+    mockUseQueryClient.mockReturnValue({
+      getQueryData: jest.fn().mockReturnValue(undefined),
+    } as never);
   });
 
   it("renders nft details and back link", () => {
@@ -89,6 +98,7 @@ describe("NftDetailPage", () => {
         nft={null}
         hasError
         errorMessage="Nao foi possivel carregar os detalhes deste NFT no momento."
+        requestedId="123"
       />,
     );
 
@@ -101,6 +111,22 @@ describe("NftDetailPage", () => {
       "href",
       "/",
     );
+  });
+
+  it("uses cached list data to render detail when SSR fallback has no nft", () => {
+    const cachedNft = createNft({ id: "3", name: "Cached Dragon" });
+    mockUseQueryClient.mockReturnValue({
+      getQueryData: jest.fn().mockReturnValue({
+        pages: [{ items: [cachedNft], count: 1 }],
+        pageParams: [1],
+      }),
+    } as never);
+
+    render(<NftDetailPage nft={null} hasError errorMessage="fetch failed" requestedId="3" />);
+
+    expect(screen.getByRole("heading", { name: "Cached Dragon" })).toBeInTheDocument();
+    expect(screen.getByText("ID: 3")).toBeInTheDocument();
+    expect(screen.queryByText("Nao foi possivel carregar este NFT")).not.toBeInTheDocument();
   });
 });
 
@@ -151,22 +177,38 @@ describe("NftDetailPage getServerSideProps", () => {
     });
   });
 
-  it("returns fallback props and status 503 when API request fails", async () => {
+  it("returns fallback props when API request fails", async () => {
     mockGetNftById.mockRejectedValue(new Error("API indisponivel"));
-    const response = { statusCode: 200 };
 
     const result = await getServerSideProps({
       params: { id: "500" },
-      res: response as never,
     } as never);
 
     expect(mockGetNftById).toHaveBeenCalledWith("500");
-    expect(response.statusCode).toBe(503);
     expect(result).toEqual({
       props: {
         nft: null,
         hasError: true,
         errorMessage: "API indisponivel",
+        requestedId: "500",
+      },
+    });
+  });
+
+  it("maps network fetch error to a user-friendly message", async () => {
+    mockGetNftById.mockRejectedValue(new Error("fetch failed"));
+
+    const result = await getServerSideProps({
+      params: { id: "501" },
+    } as never);
+
+    expect(result).toEqual({
+      props: {
+        nft: null,
+        hasError: true,
+        errorMessage:
+          "Nao foi possivel conectar com a API no momento. Tente novamente em instantes.",
+        requestedId: "501",
       },
     });
   });
