@@ -3,7 +3,7 @@ import { NFT_QUERY_DEFAULTS } from "../config/queryDefaults";
 import type { Nft } from "../types/nft.types";
 import type { GetNftsParams } from "../types/nft-query.types";
 
-// Types
+// Tipos de payload retornados pela API.
 
 type RawNft = {
   id: number;
@@ -27,6 +27,7 @@ export type GetNftsResult = {
 // Converte o modelo de transporte da API para o modelo de domínio/UI.
 function mapNft(raw: RawNft): Nft {
   const price = Number(raw.price);
+  // Falha cedo quando o backend envia preço inválido para evitar dados corrompidos na UI.
   if (Number.isNaN(price)) {
     throw new TypeError(`Invalid product price for id ${raw.id}`);
   }
@@ -51,6 +52,7 @@ export async function getNfts({
   sortBy = NFT_QUERY_DEFAULTS.sortBy,
   orderBy = NFT_QUERY_DEFAULTS.orderBy,
 }: GetNftsParams = {}): Promise<GetNftsResult> {
+  // Garante serialização/encoding correta dos parâmetros de query.
   const query = new URLSearchParams({
     page: String(page),
     rows: String(rows),
@@ -73,6 +75,7 @@ export async function getNfts({
 // Fallback para detalhe quando a API não expõe GET /products/:id.
 // Percorre páginas da coleção até encontrar o item pelo id.
 export async function getNftById(id: string): Promise<Nft | null> {
+  // Remove espaços e evita consulta desnecessária para ids vazios.
   const targetId = id.trim();
   if (!targetId) return null;
 
@@ -90,6 +93,7 @@ export async function getNftById(id: string): Promise<Nft | null> {
     const found = result.items.find((item) => item.id === targetId);
     if (found) return found;
 
+    // Deriva o limite de paginas a partir do total informado pela API.
     totalPages = Math.max(1, Math.ceil(result.count / NFT_QUERY_DEFAULTS.rowsPerPage));
     page += 1;
   }
