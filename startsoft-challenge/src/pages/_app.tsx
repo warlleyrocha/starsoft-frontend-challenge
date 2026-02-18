@@ -15,6 +15,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  variable: "--font-poppins",
 });
 
 // Evita warning no SSR ao usar layout effect apenas no cliente.
@@ -61,7 +62,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className={poppins.className}>
+      <div className={`${poppins.variable} ${poppins.className}`}>
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <AnimatePresence mode="wait" initial={false}>
