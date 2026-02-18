@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AnimatePresence, motion } from "framer-motion";
 import { Provider } from "react-redux";
 import { makeQueryClient } from "@/shared/lib/react-query/queryClient";
@@ -24,6 +25,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 export default function App({ Component, pageProps, router }: AppProps) {
   // Mantém uma única instância de QueryClient durante o ciclo de vida da aplicação.
   const [queryClient] = useState(() => makeQueryClient());
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   useIsomorphicLayoutEffect(() => {
     // Hidrata o carrinho com dados persistidos antes da primeira pintura no cliente.
@@ -76,6 +78,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
                 <Component {...pageProps} />
               </motion.div>
             </AnimatePresence>
+            {isDevelopment && <ReactQueryDevtools initialIsOpen={false} />}
           </QueryClientProvider>
         </Provider>
       </div>
