@@ -139,7 +139,10 @@ export default function NftDetailPage(props: NftDetailPageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<NftDetailPageProps> = async ({ params, res }) => {
+export const getServerSideProps: GetServerSideProps<NftDetailPageProps> = async ({
+  params,
+  res,
+}) => {
   // Garante valor string para a busca, mesmo em rotas malformadas.
   const id = typeof params?.id === "string" ? params.id : "";
 

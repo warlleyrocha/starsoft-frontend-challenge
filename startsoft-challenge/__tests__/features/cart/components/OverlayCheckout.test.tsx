@@ -96,7 +96,9 @@ describe("OverlayCheckout component", () => {
   it("renders dialog when open", () => {
     renderOverlay({ isOpen: true });
 
-    expect(screen.getByRole("dialog", { name: "Mochila de Compras", hidden: true })).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "Mochila de Compras", hidden: true }),
+    ).toBeInTheDocument();
   });
 
   it("calls onClose when clicking backdrop", () => {

@@ -140,7 +140,9 @@ describe("nftApi", () => {
     it("keeps paging until finding the requested id", async () => {
       mockApiRequest
         .mockResolvedValueOnce(createRawResponse([createRawNft({ id: 1 })], 16))
-        .mockResolvedValueOnce(createRawResponse([createRawNft({ id: 42, name: "Found on page 2" })], 16));
+        .mockResolvedValueOnce(
+          createRawResponse([createRawNft({ id: 42, name: "Found on page 2" })], 16),
+        );
 
       const result = await getNftById("42");
 

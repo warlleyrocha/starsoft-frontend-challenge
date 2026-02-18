@@ -62,10 +62,7 @@ describe("Card component", () => {
     expect(screen.getByRole("heading", { name: "Dragon Relic" })).toBeInTheDocument();
     expect(screen.getByText("An ancient relic")).toBeInTheDocument();
     expect(screen.getByText("3.75 ETH")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Ver detalhes" })).toHaveAttribute(
-      "href",
-      "/nfts/123",
-    );
+    expect(screen.getByRole("link", { name: "Ver detalhes" })).toHaveAttribute("href", "/nfts/123");
   });
 
   it("shows 'Comprar' when nft is not in cart", () => {
