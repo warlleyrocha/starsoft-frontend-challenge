@@ -80,6 +80,28 @@ describe("NftDetailPage", () => {
       "/",
     );
   });
+
+  it("renders graceful error state when detail data is unavailable", () => {
+    mockUseAppSelector.mockReturnValue(1);
+
+    render(
+      <NftDetailPage
+        nft={null}
+        hasError
+        errorMessage="Nao foi possivel carregar os detalhes deste NFT no momento."
+      />,
+    );
+
+    expect(screen.getByTestId("header-cart-count")).toHaveTextContent("1");
+    expect(screen.getByText("Nao foi possivel carregar este NFT")).toBeInTheDocument();
+    expect(
+      screen.getByText("Nao foi possivel carregar os detalhes deste NFT no momento."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Voltar para a listagem" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+  });
 });
 
 describe("NftDetailPage getServerSideProps", () => {
@@ -126,6 +148,26 @@ describe("NftDetailPage getServerSideProps", () => {
     expect(mockGetNftById).toHaveBeenCalledWith("");
     expect(result).toEqual({
       notFound: true,
+    });
+  });
+
+  it("returns fallback props and status 503 when API request fails", async () => {
+    mockGetNftById.mockRejectedValue(new Error("API indisponivel"));
+    const response = { statusCode: 200 };
+
+    const result = await getServerSideProps({
+      params: { id: "500" },
+      res: response as never,
+    } as never);
+
+    expect(mockGetNftById).toHaveBeenCalledWith("500");
+    expect(response.statusCode).toBe(503);
+    expect(result).toEqual({
+      props: {
+        nft: null,
+        hasError: true,
+        errorMessage: "API indisponivel",
+      },
     });
   });
 });

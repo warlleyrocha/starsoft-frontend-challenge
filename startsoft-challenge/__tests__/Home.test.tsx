@@ -141,7 +141,7 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("opens cart overlay when cart button is clicked", () => {
+  it("opens cart overlay when cart button is clicked", async () => {
     mockUseNftsQuery.mockReturnValue(createQueryResult({ items: [], count: 0 }));
 
     render(<Home initialNfts={null} />);
@@ -150,7 +150,7 @@ describe("Home page", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Abrir carrinho" }));
 
-    expect(screen.getByTestId("overlay-checkout")).toBeInTheDocument();
+    expect(await screen.findByTestId("overlay-checkout")).toBeInTheDocument();
   });
 
   it("closes cart overlay when close handler is triggered", () => {
