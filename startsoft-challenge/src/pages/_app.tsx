@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 import { Provider } from "react-redux";
 import { makeQueryClient } from "@/shared/lib/react-query/queryClient";
 import { store } from "@/shared/store";
@@ -19,7 +20,7 @@ const poppins = Poppins({
 // Evita warning no SSR ao usar layout effect apenas no cliente.
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   // Mantém uma única instância de QueryClient durante o ciclo de vida da aplicação.
   const [queryClient] = useState(() => makeQueryClient());
 
@@ -60,13 +61,23 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <main className={poppins.className}>
+      <div className={poppins.className}>
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={router.asPath}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.24, ease: "easeOut" }}
+              >
+                <Component {...pageProps} />
+              </motion.div>
+            </AnimatePresence>
           </QueryClientProvider>
         </Provider>
-      </main>
+      </div>
     </>
   );
 }

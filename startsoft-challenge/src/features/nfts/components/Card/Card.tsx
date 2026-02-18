@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Nft } from "../../types/nft.types";
 import styles from "./Card.module.scss";
 import { Button } from "@/shared/components/Button";
@@ -46,7 +47,13 @@ export function Card({ nft }: Props) {
           </div>
 
           <Link href={`/nfts/${nft.id}`} className={styles.detailsLink}>
-            Ver detalhes
+            <motion.span
+              whileHover={{ x: 2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
+            >
+              Ver detalhes
+            </motion.span>
           </Link>
 
           <Button size="md" className={styles.buyButton} onClick={handleAddToCart}>
