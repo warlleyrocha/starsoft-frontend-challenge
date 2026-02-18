@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import type { GetServerSideProps } from "next";
 import dynamic from "next/dynamic";
 import Head from "next/head";
@@ -13,7 +13,7 @@ import { LoadMore } from "@/features/nfts/components/LoadMore";
 import { List } from "@/features/nfts/components/List";
 import { NFT_QUERY_DEFAULTS } from "@/features/nfts/config/queryDefaults";
 import { getNfts, type GetNftsResult } from "@/features/nfts/api/nftApi";
-import { useNftsQuery } from "@/features/nfts/hooks/useNftsQuery";
+import { useNftsInfiniteQuery } from "@/features/nfts/hooks/useNftsInfiniteQuery";
 import type { Nft } from "@/features/nfts/types/nft.types";
 
 const OverlayCheckout = dynamic(
@@ -38,35 +38,32 @@ function mergeById(previous: Nft[], next: Nft[]): Nft[] {
 
 export default function Home({ initialNfts }: HomeProps) {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const [visibleItems, setVisibleItems] = useState<Nft[]>(() => initialNfts?.items ?? []);
-  const [totalCount, setTotalCount] = useState(() => initialNfts?.count ?? 0);
   const cartCount = useAppSelector(selectCartCount);
 
-  const { data, isLoading, isFetching, isError, error } = useNftsQuery(
-    {
-      page,
-      rows: NFT_QUERY_DEFAULTS.rowsPerPage,
-      sortBy: NFT_QUERY_DEFAULTS.sortBy,
-      orderBy: NFT_QUERY_DEFAULTS.orderBy,
-    },
-    {
-      // Usa dados de SSR apenas na primeira página; páginas seguintes são sempre client-side.
-      initialData: page === 1 ? (initialNfts ?? undefined) : undefined,
-    },
-  );
+  const { data, isLoading, isFetchingNextPage, isError, error, hasNextPage, fetchNextPage } =
+    useNftsInfiniteQuery(
+      {
+        rows: NFT_QUERY_DEFAULTS.rowsPerPage,
+        sortBy: NFT_QUERY_DEFAULTS.sortBy,
+        orderBy: NFT_QUERY_DEFAULTS.orderBy,
+      },
+      {
+        initialData: initialNfts ?? undefined,
+      },
+    );
 
-  useEffect(() => {
-    if (!data) return;
+  const visibleItems = useMemo<Nft[]>(() => {
+    if (!data) return [];
 
-    setTotalCount(data.count);
-    // Página 1 substitui a lista; páginas seguintes fazem append sem duplicidade.
-    setVisibleItems((prev) => (page === 1 ? data.items : mergeById(prev, data.items)));
-  }, [data, page]);
+    return data.pages.reduce<Nft[]>((items, pageData) => mergeById(items, pageData.items), []);
+  }, [data]);
 
-  const hasViewedAll = totalCount > 0 && visibleItems.length >= totalCount;
+  const totalCount = data?.pages[0]?.count ?? initialNfts?.count ?? 0;
+
+  const hasViewedAll =
+    (totalCount > 0 && visibleItems.length >= totalCount) || hasNextPage === false;
   const isInitialLoading = isLoading && visibleItems.length === 0;
-  const isLoadingMore = isFetching && !isInitialLoading;
+  const isLoadingMore = isFetchingNextPage;
   const isEmptySuccess = !isInitialLoading && !isError && visibleItems.length === 0;
   const progress = totalCount > 0 ? Math.round((visibleItems.length / totalCount) * 100) : 0;
 
@@ -76,7 +73,7 @@ export default function Home({ initialNfts }: HomeProps) {
   const handleLoadMore = () => {
     // Evita avançar paginação quando já exibiu tudo ou quando uma página já está em carregamento.
     if (hasViewedAll || isLoadingMore) return;
-    setPage((prev) => prev + 1);
+    void fetchNextPage();
   };
 
   return (
