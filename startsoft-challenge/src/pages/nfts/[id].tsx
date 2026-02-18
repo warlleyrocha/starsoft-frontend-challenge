@@ -18,6 +18,7 @@ type NftDetailPageProps = {
 
 export default function NftDetailPage({ nft }: NftDetailPageProps) {
   const cartCount = useAppSelector(selectCartCount);
+  // Reaproveita o mesmo título para SEO e Open Graph.
   const pageTitle = `${nft.name} | Starsoft Challenge`;
 
   return (
@@ -73,10 +74,12 @@ export default function NftDetailPage({ nft }: NftDetailPageProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<NftDetailPageProps> = async ({ params }) => {
+  // Garante valor string para a busca, mesmo em rotas malformadas.
   const id = typeof params?.id === "string" ? params.id : "";
   const nft = await getNftById(id);
 
   if (!nft) {
+    // Delega para o Next.js a resposta 404 quando o item não existe.
     return {
       notFound: true,
     };

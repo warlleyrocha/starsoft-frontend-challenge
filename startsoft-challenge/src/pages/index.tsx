@@ -20,6 +20,7 @@ const OverlayCheckout = dynamic(
   () => import("@/features/cart/components/OverlayCheckout").then((mod) => mod.OverlayCheckout),
   {
     loading: () => null,
+    // Renderiza o overlay apenas no cliente para evitar acoplamento com SSR.
     ssr: false,
   },
 );
@@ -29,6 +30,7 @@ type HomeProps = {
 };
 
 function mergeById(previous: Nft[], next: Nft[]): Nft[] {
+  // Algumas páginas podem repetir itens; garante lista incremental sem duplicar IDs.
   const seen = new Set(previous.map((item) => item.id));
   const uniqueNext = next.filter((item) => !seen.has(item.id));
   return [...previous, ...uniqueNext];
@@ -49,6 +51,7 @@ export default function Home({ initialNfts }: HomeProps) {
       orderBy: NFT_QUERY_DEFAULTS.orderBy,
     },
     {
+      // Usa dados de SSR apenas na primeira página; páginas seguintes são sempre client-side.
       initialData: page === 1 ? (initialNfts ?? undefined) : undefined,
     },
   );
@@ -57,6 +60,7 @@ export default function Home({ initialNfts }: HomeProps) {
     if (!data) return;
 
     setTotalCount(data.count);
+    // Página 1 substitui a lista; páginas seguintes fazem append sem duplicidade.
     setVisibleItems((prev) => (page === 1 ? data.items : mergeById(prev, data.items)));
   }, [data, page]);
 
@@ -70,6 +74,7 @@ export default function Home({ initialNfts }: HomeProps) {
   const loadMoreLabel = hasViewedAll ? "Você já visualizou tudo" : "Carregar mais";
 
   const handleLoadMore = () => {
+    // Evita avançar paginação quando já exibiu tudo ou quando uma página já está em carregamento.
     if (hasViewedAll || isLoadingMore) return;
     setPage((prev) => prev + 1);
   };
@@ -139,6 +144,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
       },
     };
   } catch {
+    // Mantém a página renderizável mesmo se a API falhar no SSR.
     return {
       props: {
         initialNfts: null,

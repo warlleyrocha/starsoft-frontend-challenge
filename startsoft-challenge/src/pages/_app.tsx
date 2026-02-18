@@ -16,12 +16,15 @@ const poppins = Poppins({
   display: "swap",
 });
 
+// Evita warning no SSR ao usar layout effect apenas no cliente.
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export default function App({ Component, pageProps }: AppProps) {
+  // Mantém uma única instância de QueryClient durante o ciclo de vida da aplicação.
   const [queryClient] = useState(() => makeQueryClient());
 
   useIsomorphicLayoutEffect(() => {
+    // Hidrata o carrinho com dados persistidos antes da primeira pintura no cliente.
     const persistedItems = loadCartItems();
     if (persistedItems.length > 0) {
       store.dispatch(hydrateCart(persistedItems));
@@ -35,6 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
       const items = store.getState().cart.items;
       const nextSerialized = JSON.stringify(items);
 
+      // Evita escrita redundante no storage quando o estado não mudou.
       if (nextSerialized === lastSerialized) return;
 
       lastSerialized = nextSerialized;
