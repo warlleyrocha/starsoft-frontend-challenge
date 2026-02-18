@@ -100,7 +100,7 @@ export default function NftDetailPage(props: NftDetailPageProps) {
 
         <Header cartCount={cartCount} onCartButtonClick={() => setIsCartOpen(true)} />
 
-        <main className="container">
+        <main className={`container ${styles.main}`}>
           <section className={styles.wrapper}>
             <Link href="/" className={styles.backLink}>
               Voltar para a listagem
@@ -135,7 +135,7 @@ export default function NftDetailPage(props: NftDetailPageProps) {
 
       <Header cartCount={cartCount} onCartButtonClick={() => setIsCartOpen(true)} />
 
-      <main className="container">
+      <main className={`container ${styles.main}`}>
         <section className={styles.wrapper}>
           <Link href="/" className={styles.backLink}>
             Voltar para a listagem
@@ -146,6 +146,7 @@ export default function NftDetailPage(props: NftDetailPageProps) {
               <Image
                 src={resolvedNft.image}
                 alt={resolvedNft.name}
+                className={styles.nftImage}
                 width={420}
                 height={360}
                 priority
