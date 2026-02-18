@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/shared/store/hooks";
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} alt={props.alt ?? ""} />,
 }));
 
 jest.mock("framer-motion", () => ({

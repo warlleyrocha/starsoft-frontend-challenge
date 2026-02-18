@@ -7,7 +7,7 @@ import type { Nft } from "@/features/nfts/types/nft.types";
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} alt={props.alt ?? ""} />,
 }));
 
 jest.mock("next/link", () => ({
