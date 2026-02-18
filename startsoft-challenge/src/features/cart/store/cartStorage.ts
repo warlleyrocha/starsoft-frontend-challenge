@@ -1,5 +1,6 @@
 import type { CartItem } from "./cartSlice";
 
+// Versão da chave para permitir migrações futuras de formato sem conflito.
 const CART_STORAGE_KEY = "starsoft_cart_v1";
 
 type CartStorageShape = {
@@ -19,8 +20,10 @@ export function loadCartItems(): unknown[] {
     const data = parsed as Record<string, unknown>;
     if (!Array.isArray(data.items)) return [];
 
+    // Retorna payload bruto; a sanitização final acontece no hydrateCart.
     return data.items;
   } catch {
+    // Leitura deve ser fail-safe para não quebrar renderização.
     return [];
   }
 }
