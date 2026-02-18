@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { getNfts, type GetNftsResult } from "@/features/nfts/api/nftApi";
 import type { Nft } from "@/features/nfts/types/nft.types";
-import { useNftsQuery } from "@/features/nfts/hooks/useNftsQuery";
+import { useNftsInfiniteQuery } from "@/features/nfts/hooks/useNftsInfiniteQuery";
 import { useAppSelector } from "@/shared/store/hooks";
 import { NFT_QUERY_DEFAULTS } from "@/features/nfts/config/queryDefaults";
 import Home, { getServerSideProps } from "@/pages/index";
@@ -10,8 +10,8 @@ jest.mock("@/shared/store/hooks", () => ({
   useAppSelector: jest.fn(),
 }));
 
-jest.mock("@/features/nfts/hooks/useNftsQuery", () => ({
-  useNftsQuery: jest.fn(),
+jest.mock("@/features/nfts/hooks/useNftsInfiniteQuery", () => ({
+  useNftsInfiniteQuery: jest.fn(),
 }));
 
 jest.mock("@/features/nfts/api/nftApi", () => ({
@@ -81,7 +81,9 @@ jest.mock("@/features/cart/components/OverlayCheckout", () => ({
     ) : null,
 }));
 
-const mockUseNftsQuery = useNftsQuery as jest.MockedFunction<typeof useNftsQuery>;
+const mockUseNftsInfiniteQuery = useNftsInfiniteQuery as jest.MockedFunction<
+  typeof useNftsInfiniteQuery
+>;
 const mockUseAppSelector = useAppSelector as jest.Mock;
 const mockGetNfts = getNfts as jest.MockedFunction<typeof getNfts>;
 
@@ -96,34 +98,47 @@ function createNft(overrides: Partial<Nft> = {}): Nft {
   };
 }
 
-function createQueryResult(
-  data: GetNftsResult | undefined,
+function createInfiniteQueryResult(
+  pages: GetNftsResult[] | undefined,
   overrides: Partial<{
     isLoading: boolean;
-    isFetching: boolean;
+    isFetchingNextPage: boolean;
     isError: boolean;
     error: unknown;
+    hasNextPage: boolean;
+    fetchNextPage: jest.Mock;
   }> = {},
 ) {
   return {
-    data,
+    data: pages
+      ? {
+          pages,
+          pageParams: pages.map((_, index) => index + 1),
+        }
+      : undefined,
     isLoading: false,
-    isFetching: false,
+    isFetchingNextPage: false,
     isError: false,
     error: null,
+    hasNextPage: true,
+    fetchNextPage: jest.fn().mockResolvedValue(undefined),
     ...overrides,
-  } as ReturnType<typeof useNftsQuery>;
+  } as unknown as ReturnType<typeof useNftsInfiniteQuery>;
 }
 
 describe("Home page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAppSelector.mockReturnValue(0);
-    mockUseNftsQuery.mockReturnValue(createQueryResult(undefined));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult(undefined, { hasNextPage: false }),
+    );
   });
 
   it("shows loading state on first render without items", () => {
-    mockUseNftsQuery.mockReturnValue(createQueryResult(undefined, { isLoading: true }));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult(undefined, { isLoading: true, hasNextPage: false }),
+    );
 
     render(<Home initialNfts={null} />);
 
@@ -131,7 +146,9 @@ describe("Home page", () => {
   });
 
   it("shows empty state when query succeeds with no items", () => {
-    mockUseNftsQuery.mockReturnValue(createQueryResult({ items: [], count: 0 }));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([{ items: [], count: 0 }], { hasNextPage: false }),
+    );
 
     render(<Home initialNfts={null} />);
 
@@ -141,8 +158,10 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("opens cart overlay when cart button is clicked", () => {
-    mockUseNftsQuery.mockReturnValue(createQueryResult({ items: [], count: 0 }));
+  it("opens cart overlay when cart button is clicked", async () => {
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([{ items: [], count: 0 }], { hasNextPage: false }),
+    );
 
     render(<Home initialNfts={null} />);
 
@@ -150,11 +169,13 @@ describe("Home page", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Abrir carrinho" }));
 
-    expect(screen.getByTestId("overlay-checkout")).toBeInTheDocument();
+    expect(await screen.findByTestId("overlay-checkout")).toBeInTheDocument();
   });
 
   it("closes cart overlay when close handler is triggered", () => {
-    mockUseNftsQuery.mockReturnValue(createQueryResult({ items: [], count: 0 }));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([{ items: [], count: 0 }], { hasNextPage: false }),
+    );
 
     render(<Home initialNfts={null} />);
 
@@ -165,7 +186,7 @@ describe("Home page", () => {
     expect(screen.queryByTestId("overlay-checkout")).not.toBeInTheDocument();
   });
 
-  it("loads next page and merges items without duplicated ids", async () => {
+  it("merges paginated pages without duplicated ids", () => {
     const firstPage: GetNftsResult = {
       items: [createNft({ id: "1", name: "NFT One" })],
       count: 2,
@@ -178,24 +199,34 @@ describe("Home page", () => {
       count: 2,
     };
 
-    mockUseNftsQuery.mockImplementation(({ page }) => {
-      if (page === 2) return createQueryResult(secondPage);
-      return createQueryResult(firstPage);
-    });
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([firstPage, secondPage], { hasNextPage: false }),
+    );
 
     render(<Home initialNfts={firstPage} />);
 
     expect(screen.getByText("NFT One")).toBeInTheDocument();
+    expect(screen.getByText("NFT Two")).toBeInTheDocument();
+    expect(screen.queryAllByText("NFT One")).toHaveLength(1);
+    expect(screen.queryByText("Duplicate name should not appear")).not.toBeInTheDocument();
+  });
+
+  it("requests next page when load more is clicked", () => {
+    const firstPage: GetNftsResult = {
+      items: [createNft({ id: "1", name: "NFT One" })],
+      count: 2,
+    };
+    const fetchNextPage = jest.fn().mockResolvedValue(undefined);
+
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([firstPage], { hasNextPage: true, fetchNextPage }),
+    );
+
+    render(<Home initialNfts={firstPage} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Carregar mais" }));
 
-    await waitFor(() => {
-      expect(screen.getByText("NFT Two")).toBeInTheDocument();
-    });
-
-    expect(screen.queryAllByText("NFT One")).toHaveLength(1);
-    expect(screen.queryByText("Duplicate name should not appear")).not.toBeInTheDocument();
-    expect(mockUseNftsQuery.mock.calls.some(([params]) => params.page === 2)).toBe(true);
+    expect(fetchNextPage).toHaveBeenCalledTimes(1);
   });
 
   it("disables load more button while loading next page", () => {
@@ -204,7 +235,9 @@ describe("Home page", () => {
       count: 2,
     };
 
-    mockUseNftsQuery.mockReturnValue(createQueryResult(firstPage, { isFetching: true }));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([firstPage], { isFetchingNextPage: true }),
+    );
 
     render(<Home initialNfts={firstPage} />);
 
@@ -212,8 +245,12 @@ describe("Home page", () => {
   });
 
   it("shows query error when no item is visible", () => {
-    mockUseNftsQuery.mockReturnValue(
-      createQueryResult(undefined, { isError: true, error: new Error("Falha ao consultar API") }),
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult(undefined, {
+        isError: true,
+        error: new Error("Falha ao consultar API"),
+        hasNextPage: false,
+      }),
     );
 
     render(<Home initialNfts={null} />);
@@ -228,8 +265,12 @@ describe("Home page", () => {
       count: 1,
     };
 
-    mockUseNftsQuery.mockReturnValue(
-      createQueryResult(firstPage, { isError: true, error: new Error("Falha ao atualizar") }),
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([firstPage], {
+        isError: true,
+        error: new Error("Falha ao atualizar"),
+        hasNextPage: false,
+      }),
     );
 
     render(<Home initialNfts={firstPage} />);
@@ -243,14 +284,17 @@ describe("Home page", () => {
       items: [createNft({ id: "1", name: "NFT One" })],
       count: 1,
     };
+    const fetchNextPage = jest.fn().mockResolvedValue(undefined);
 
-    mockUseNftsQuery.mockImplementation(() => createQueryResult(fullPage));
+    mockUseNftsInfiniteQuery.mockReturnValue(
+      createInfiniteQueryResult([fullPage], { hasNextPage: false, fetchNextPage }),
+    );
 
     render(<Home initialNfts={fullPage} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Você já visualizou tudo" }));
 
-    expect(mockUseNftsQuery.mock.calls.some(([params]) => params.page === 2)).toBe(false);
+    expect(fetchNextPage).not.toHaveBeenCalled();
   });
 });
 

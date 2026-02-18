@@ -1,5 +1,3 @@
-// Este arquivo define o slice do Redux para o carrinho de compras, utilizando o createSlice do Redux Toolkit para simplificar a criação de reducers e ações. Ele inclui tipos para os itens do carrinho e o estado do carrinho, bem como funções auxiliares para normalizar e sanitizar os dados dos itens. As ações disponíveis permitem adicionar, remover, aumentar ou diminuir a quantidade de itens no carrinho, limpar o carrinho e hidratar o estado do carrinho a partir de dados externos (como localStorage).
-
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export type CartItem = {
@@ -16,6 +14,7 @@ type CartState = {
 };
 
 type AddItemPayload = Omit<CartItem, "quantity"> & {
+  // Quantidade opcional para permitir addItem simples (default = 1).
   quantity?: number;
 };
 
@@ -29,12 +28,14 @@ const initialState: CartState = {
 
 function normalizeQuantity(value: unknown): number {
   const num = typeof value === "number" ? value : Number(value);
+  // Normaliza para inteiro >= 1 para manter invariantes do carrinho.
   if (!Number.isFinite(num) || num < 1) return 1;
   return Math.floor(num);
 }
 
 function normalizePrice(value: unknown): number | null {
   const num = typeof value === "number" ? value : Number(value);
+  // Rejeita preço inválido; null sinaliza item não confiável para o estado.
   if (!Number.isFinite(num) || num < 0) return null;
   return num;
 }
@@ -44,6 +45,7 @@ function normalizeText(value: unknown, fallback = ""): string {
 }
 
 function sanitizeItems(input: unknown): CartItem[] {
+  // Hidratação aceita payload desconhecido (ex.: localStorage) e filtra dados inválidos.
   if (!Array.isArray(input)) return [];
 
   return input.reduce<CartItem[]>((acc, raw) => {
@@ -83,6 +85,7 @@ const cartSlice = createSlice({
       const existing = state.items.find((item) => item.id === normalizedId);
 
       if (existing) {
+        // Mesmo id representa o mesmo item no carrinho; acumula quantidade.
         existing.quantity += quantityToAdd;
         return;
       }
@@ -121,6 +124,7 @@ const cartSlice = createSlice({
       if (!target) return;
 
       if (target.quantity <= 1) {
+        // Ao chegar em 1, decrementar remove o item para evitar quantity 0.
         state.items = state.items.filter((item) => item.id !== normalizedId);
         return;
       }
@@ -133,6 +137,7 @@ const cartSlice = createSlice({
     },
 
     hydrateCart: (state, action: PayloadAction<unknown>) => {
+      // Substitui o estado por uma versão sanitizada da fonte persistida.
       state.items = sanitizeItems(action.payload);
     },
   },

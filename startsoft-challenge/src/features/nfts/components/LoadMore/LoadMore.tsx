@@ -17,7 +17,13 @@ export function LoadMore({ label, progress, onClick, isLoading = false }: Props)
         <div className={styles.fill} style={{ width: `${safeProgress}%` }} />
       </div>
 
-      <Button variant="ghost" size="lg" onClick={onClick} isLoading={isLoading} className={styles.button}>
+      <Button
+        variant="ghost"
+        size="lg"
+        onClick={onClick}
+        isLoading={isLoading}
+        className={styles.button}
+      >
         {label}
       </Button>
     </section>

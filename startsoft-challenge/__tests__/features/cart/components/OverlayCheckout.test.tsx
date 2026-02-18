@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/shared/store/hooks";
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />,
+  default: (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} alt={props.alt ?? ""} />,
 }));
 
 jest.mock("framer-motion", () => ({
@@ -96,7 +96,9 @@ describe("OverlayCheckout component", () => {
   it("renders dialog when open", () => {
     renderOverlay({ isOpen: true });
 
-    expect(screen.getByRole("dialog", { name: "Mochila de Compras", hidden: true })).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "Mochila de Compras", hidden: true }),
+    ).toBeInTheDocument();
   });
 
   it("calls onClose when clicking backdrop", () => {
