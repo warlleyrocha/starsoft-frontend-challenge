@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { GetServerSideProps } from "next";
+import Head from "next/head";
 
 import { Header } from "@/shared/components/Header";
 import { Footer } from "@/shared/components/Footer";
@@ -17,9 +18,18 @@ type NftDetailPageProps = {
 
 export default function NftDetailPage({ nft }: NftDetailPageProps) {
   const cartCount = useAppSelector(selectCartCount);
+  const pageTitle = `${nft.name} | Starsoft Challenge`;
 
   return (
     <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={nft.description} key="description" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={nft.description} />
+        <meta property="og:image" content={nft.image} />
+      </Head>
+
       <Header cartCount={cartCount} />
 
       <main className="container">
@@ -30,7 +40,14 @@ export default function NftDetailPage({ nft }: NftDetailPageProps) {
 
           <article className={styles.card}>
             <div className={styles.imageWrapper}>
-              <Image src={nft.image} alt={nft.name} width={420} height={360} />
+              <Image
+                src={nft.image}
+                alt={nft.name}
+                width={420}
+                height={360}
+                priority
+                sizes="(max-width: 600px) calc(100vw - 48px), 420px"
+              />
             </div>
 
             <div className={styles.content}>

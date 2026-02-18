@@ -1,9 +1,9 @@
 import "@/styles/globals.scss";
 import { Poppins } from "next/font/google";
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Provider } from "react-redux";
 import { makeQueryClient } from "@/shared/lib/react-query/queryClient";
 import { store } from "@/shared/store";
@@ -45,13 +45,24 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <main className={poppins.className}>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </Provider>
-    </main>
+    <>
+      <Head>
+        <title>Starsoft Challenge</title>
+        <meta
+          name="description"
+          content="Catálogo de NFTs com listagem, detalhes de itens e carrinho de compra."
+          key="description"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+
+      <main className={poppins.className}>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+          </QueryClientProvider>
+        </Provider>
+      </main>
+    </>
   );
 }
