@@ -61,6 +61,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
           content="Catálogo de NFTs com listagem, detalhes de itens e carrinho de compra."
           key="description"
         />
+        <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
