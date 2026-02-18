@@ -122,7 +122,7 @@ export default function Home({ initialNfts }: HomeProps) {
         {isError && visibleItems.length > 0 && <p>{errorMessage}</p>}
       </main>
 
-      {isCartOpen && <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
+      <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       <Footer />
     </>

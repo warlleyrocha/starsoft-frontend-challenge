@@ -75,7 +75,7 @@ export default function NftDetailPage(props: NftDetailPageProps) {
           </section>
         </main>
 
-        {isCartOpen && <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
+        <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
         <Footer />
       </>
@@ -132,7 +132,7 @@ export default function NftDetailPage(props: NftDetailPageProps) {
         </section>
       </main>
 
-      {isCartOpen && <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
+      <OverlayCheckout isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       <Footer />
     </>
